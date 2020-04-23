@@ -4,9 +4,30 @@ extern crate regex;
 
 pub mod network_ioc{
     use regex::Regex;
+    use regex::RegexBuilder;
+    use regex::RegexSet;
+    use regex::RegexSetBuilder;
 
-    const URL: &str  = r"(\b((http|https|hxxp|hxxps|nntp|ntp|rdp|sftp|smtp|ssh|tor|webdav|xmpp)://[\S]{1,})\b)"; 
-    const DOMAIN: &str = "([A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*\\.(abogado|ac|academy|accountants|active|actor|ad|adult|ae|aero|af|ag|\
+    #[derive(Debug, PartialEq, Eq)]
+    pub enum NetworkIOC<'a> {
+        URL(&'a str),
+        DOMAIN(&'a str),
+        EMAIL(&'a str),
+        IPV4(&'a str),
+        IPV6(&'a str),
+    }
+
+    #[derive(Debug, PartialEq, Eq)]
+    pub struct NetworkIOCS<'a> {
+        urls: Vec<NetworkIOC<'a>>,
+        domains: Vec<NetworkIOC<'a>>,
+        emails: Vec<NetworkIOC<'a>>,
+        ipv4s: Vec<NetworkIOC<'a>>,
+        ipv6s: Vec<NetworkIOC<'a>>
+    }
+
+    const URL_PATTERN: &str  = r"(\b((http|https|hxxp|hxxps|nntp|ntp|rdp|sftp|smtp|ssh|tor|webdav|xmpp)://[\S]{1,})\b)"; 
+    const DOMAIN_PATTERN: &str = "([A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*\\.(abogado|ac|academy|accountants|active|actor|ad|adult|ae|aero|af|ag|\
         agency|ai|airforce|al|allfinanz|alsace|am|amsterdam|an|android|ao|aq|aquarelle|ar|archi|army|arpa|as|asia|associates|at|\
         attorney|au|auction|audio|autos|aw|ax|axa|az|ba|band|bank|bar|barclaycard|barclays|bargains|bayern|bb|bd|be|beer|berlin|\
         best|bf|bg|bh|bi|bid|bike|bingo|bio|biz|bj|black|blackfriday|bloomberg|blue|bm|bmw|bn|bnpparibas|bo|boo|boutique|br|\
@@ -39,47 +60,145 @@ pub mod network_ioc{
         vet|vg|vi|viajes|video|villas|vision|vlaanderen|vn|vodka|vote|voting|voto|voyage|vu|wales|wang|watch|webcam|website|wed|wedding|wf|\
         whoswho|wien|wiki|williamhill|wme|work|works|world|ws|wtc|wtf|xyz|yachts|yandex|ye|yoga|yokohama|youtube|yt|za|zm|zone|zuerich|zw)\\b)";
 
-    const EMAIL : &str = r#"[A-Za-z0-9_.]+@[0-9a-z.-]+"#;
+    const EMAIL_PATTERN : &str = r#"[A-Za-z0-9_.]+@[0-9a-z.-]+"#;
 
-    pub fn parse_urls(input: &str) -> Vec<&str> {
+    const IPV4_PATTERN : &str = r#"(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)[?\.]?){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"#;
+
+    const IPV6_PATTERN : &str = r#"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|
+                                ([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}
+                                (:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:
+                                ((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]
+                                    |1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]
+                                        |1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"#;
+
+    pub fn parse_network_iocs(input: &str) -> NetworkIOCS {
+
         lazy_static! {
-            static ref URL_RE: Regex = Regex::new(URL).unwrap();
+            static ref NETWORK_IOCS_RE: RegexSet = RegexSetBuilder::new(
+                vec![
+                    URL_PATTERN,
+                    EMAIL_PATTERN,
+                    DOMAIN_PATTERN,
+                    IPV6_PATTERN,
+                    IPV4_PATTERN
+            ]
+            )
+            .case_insensitive(true)
+            .ignore_whitespace(true)
+            .build().unwrap();
         }
-        return URL_RE.find_iter(input).map(|x|x.as_str()).collect();
+        let matches = NETWORK_IOCS_RE.matches(input);
+        return NetworkIOCS{
+            urls: if matches.matched(0) { parse_urls(input) } else { vec![]},
+            emails: if matches.matched(1) { parse_emails(input) } else { vec![]},
+            domains: if matches.matched(2) { parse_domains(input) } else { vec![]},
+            ipv6s: if matches.matched(3) { parse_ipv6(input)} else { vec![]},
+            ipv4s: if matches.matched(4) { parse_ipv4(input)} else { vec![]},
+        } 
     }
 
-    pub fn parse_domains(input: &str) -> Vec<&str> {
+    pub fn parse_ipv6(input: &str) -> Vec<NetworkIOC> {
         lazy_static! {
-            static ref DOMAIN_RE: Regex = Regex::new(DOMAIN).unwrap();
+            static ref IPV6_RE: Regex = RegexBuilder::new(IPV6_PATTERN)
+            .case_insensitive(true)
+            .ignore_whitespace(true)
+            .build().unwrap();
         }
-        return DOMAIN_RE.find_iter(input).map(|x|x.as_str()).collect();
+        return IPV6_RE.find_iter(input)
+        .map(|x|x.as_str())
+        .map(|x|NetworkIOC::IPV6(x))
+        .collect();
+    }
+
+
+    pub fn parse_ipv4(input: &str) -> Vec<NetworkIOC> {
+        lazy_static! {
+            static ref IPV4_RE: Regex = RegexBuilder::new(IPV4_PATTERN)
+            .case_insensitive(true)
+            .ignore_whitespace(true)
+            .build().unwrap();
+        }
+        return IPV4_RE.find_iter(input)
+        .map(|x|x.as_str())
+        .map(|x|NetworkIOC::IPV4(x))
+        .collect();
+    }
+
+    pub fn parse_urls(input: &str) -> Vec<NetworkIOC> {
+        lazy_static! {
+            static ref URL_RE: Regex = RegexBuilder::new(URL_PATTERN)
+            .case_insensitive(true)
+            .ignore_whitespace(true)
+            .build().unwrap();
+        }
+        return URL_RE.find_iter(input)
+        .map(|x|NetworkIOC::URL(x.as_str()))
+        .collect();
+    }
+
+    pub fn parse_domains(input: &str) -> Vec<NetworkIOC> {
+        lazy_static! {
+            static ref DOMAIN_RE: Regex = RegexBuilder::new(DOMAIN_PATTERN)
+            .case_insensitive(true)
+            .ignore_whitespace(true)
+            .build().unwrap();
+        }
+        return DOMAIN_RE.find_iter(input)
+        .map(|x|NetworkIOC::DOMAIN(x.as_str()))
+        .collect();
 
     }
 
-    pub fn parse_emails(input: &str) -> Vec<&str> {
+    pub fn parse_emails(input: &str) -> Vec<NetworkIOC> {
         lazy_static! {
-            static ref EMAIL_RE: Regex = Regex::new(EMAIL).unwrap();
+            static ref EMAIL_RE: Regex = RegexBuilder::new(EMAIL_PATTERN)
+            .case_insensitive(true)
+            .ignore_whitespace(true)
+            .build().unwrap();
         }
-        return EMAIL_RE.find_iter(input).map(|x|x.as_str()).collect();
+        return EMAIL_RE.find_iter(input)
+        .map(|x|NetworkIOC::EMAIL(x.as_str())).collect();
     }
+
 
     #[cfg(test)]
     mod tests {
         use super::*;
     
         #[test]
+        fn test_parase_ipv6(){
+            assert_eq!(parse_ipv6("this has a ipv6 address 2001:0db8:85a3:0000:0000:8a2e:0370:7334"), vec![NetworkIOC::IPV6("2001:0db8:85a3:0000:0000:8a2e:0370:7334")])
+        }
+        #[test]
         fn test_parse_domains() {
-            assert_eq!(parse_domains("this has a www.test.com"), vec!["www.test.com"]);
+            assert_eq!(parse_domains("this has a www.test.com"), vec![NetworkIOC::DOMAIN("www.test.com")]);
         }
 
         #[test]
         fn test_parse_urls() {
-            assert_eq!(parse_urls("this has a http://www.test.com"), vec!["http://www.test.com"]);
+            assert_eq!(parse_urls("this has a http://www.test.com"), vec![NetworkIOC::URL("http://www.test.com")]);
         }
 
         #[test]
         fn test_parse_emails() {
-            assert_eq!(parse_emails("this has an email test@test.com"), vec!["test@test.com"]);
+            assert_eq!(parse_emails("this has an email test@test.com"), vec![NetworkIOC::EMAIL("test@test.com")]);
+        }
+
+        #[test]
+        fn test_parse_ipv4() {
+            assert_eq!(parse_ipv4("this has an ipv4 127.0.0.1"), vec![NetworkIOC::IPV4("127.0.0.1")]);
+        }
+
+        #[test]
+        fn test_parse_network_iocs() {
+            let results = parse_network_iocs("127.0.0.1 www.test.com");
+            assert_eq!(results, NetworkIOCS{
+                urls : vec![],
+                domains: vec![NetworkIOC::DOMAIN("www.test.com")],
+                emails: vec![],
+                ipv4s: vec![NetworkIOC::IPV4("127.0.0.1")],
+                ipv6s: vec![],
+            })
         }
     }
 
