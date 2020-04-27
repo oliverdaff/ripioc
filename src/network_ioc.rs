@@ -4,6 +4,9 @@
  use regex::RegexSet;
  use regex::RegexSetBuilder;
 
+ use std::borrow::Cow;
+ use std::boxed::Box;
+
  #[derive(Debug, PartialEq, Eq)]
  pub enum NetworkIOC<'a> {
      URL(&'a str),
@@ -72,11 +75,11 @@
      lazy_static! {
          static ref NETWORK_IOCS_RE: RegexSet = RegexSetBuilder::new(
              vec![
-                 URL_PATTERN,
-                 EMAIL_PATTERN,
-                 DOMAIN_PATTERN,
-                 IPV6_PATTERN,
-                 IPV4_PATTERN
+                 URL_PATTERN,       //0
+                 EMAIL_PATTERN,     //1
+                 DOMAIN_PATTERN,    //2
+                 IPV6_PATTERN,      //3
+                 IPV4_PATTERN       //4
          ]
          )
          .case_insensitive(true)
@@ -93,39 +96,34 @@
      } 
  }
 
+
+ fn compile_re<'a>(pattern: Cow<str>) -> Box<Regex> {
+         let mut x =  RegexBuilder::new(&pattern);
+         x.case_insensitive(true);
+         x.ignore_whitespace(true);
+         return Box::new(x.build().unwrap());
+ }
+
  pub fn parse_ipv6(input: &str) -> Vec<NetworkIOC> {
      lazy_static! {
-         static ref IPV6_RE: Regex = RegexBuilder::new(IPV6_PATTERN)
-         .case_insensitive(true)
-         .ignore_whitespace(true)
-         .build().unwrap();
+         static ref IPV6_RE: Box<Regex> = compile_re(Cow::from(IPV6_PATTERN));
      }
-     return IPV6_RE.find_iter(input)
-     .map(|x|x.as_str())
-     .map(|x|NetworkIOC::IPV6(x))
-     .collect();
+     return IPV6_RE.find_iter(input).map(|x| NetworkIOC::IPV6(x.as_str())).collect();
  }
 
 
  pub fn parse_ipv4(input: &str) -> Vec<NetworkIOC> {
      lazy_static! {
-         static ref IPV4_RE: Regex = RegexBuilder::new(IPV4_PATTERN)
-         .case_insensitive(true)
-         .ignore_whitespace(true)
-         .build().unwrap();
+         static ref IPV4_RE: Box<Regex> = compile_re(Cow::from(IPV4_PATTERN));
      }
      return IPV4_RE.find_iter(input)
-     .map(|x|x.as_str())
-     .map(|x|NetworkIOC::IPV4(x))
+     .map(|x|NetworkIOC::IPV4(x.as_str()))
      .collect();
  }
 
  pub fn parse_urls(input: &str) -> Vec<NetworkIOC> {
      lazy_static! {
-         static ref URL_RE: Regex = RegexBuilder::new(URL_PATTERN)
-         .case_insensitive(true)
-         .ignore_whitespace(true)
-         .build().unwrap();
+         static ref URL_RE: Box<Regex> = compile_re(Cow::from(URL_PATTERN));
      }
      return URL_RE.find_iter(input)
      .map(|x|NetworkIOC::URL(x.as_str()))
@@ -134,10 +132,7 @@
 
  pub fn parse_domains(input: &str) -> Vec<NetworkIOC> {
      lazy_static! {
-         static ref DOMAIN_RE: Regex = RegexBuilder::new(DOMAIN_PATTERN)
-         .case_insensitive(true)
-         .ignore_whitespace(true)
-         .build().unwrap();
+         static ref DOMAIN_RE: Box<Regex> = compile_re(Cow::from(DOMAIN_PATTERN));
      }
      return DOMAIN_RE.find_iter(input)
      .map(|x|NetworkIOC::DOMAIN(x.as_str()))
@@ -148,10 +143,7 @@
 
  pub fn parse_emails(input: &str) -> Vec<NetworkIOC> {
      lazy_static! {
-         static ref EMAIL_RE: Regex = RegexBuilder::new(EMAIL_PATTERN)
-         .case_insensitive(true)
-         .ignore_whitespace(true)
-         .build().unwrap();
+         static ref EMAIL_RE: Box<Regex> = compile_re(Cow::from(EMAIL_PATTERN));
      }
      return EMAIL_RE.find_iter(input)
      .map(|x|NetworkIOC::EMAIL(x.as_str())).collect();
