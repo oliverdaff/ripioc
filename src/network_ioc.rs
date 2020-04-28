@@ -1,11 +1,12 @@
 
  use regex::Regex;
- use regex::RegexBuilder;
  use regex::RegexSet;
  use regex::RegexSetBuilder;
 
  use std::borrow::Cow;
  use std::boxed::Box;
+
+use crate::regex_builder::compile_re;
 
  #[derive(Debug, PartialEq, Eq)]
  pub enum NetworkIOC<'a> {
@@ -96,13 +97,6 @@
      } 
  }
 
-
- fn compile_re<'a>(pattern: Cow<str>) -> Box<Regex> {
-         let mut x =  RegexBuilder::new(&pattern);
-         x.case_insensitive(true);
-         x.ignore_whitespace(true);
-         return Box::new(x.build().unwrap());
- }
 
  pub fn parse_ipv6(input: &str) -> Vec<NetworkIOC> {
      lazy_static! {
