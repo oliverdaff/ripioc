@@ -4,6 +4,7 @@ extern crate regex;
 
 pub mod hash_ioc;
 pub mod network_ioc;
+pub mod file_ioc;
 
 mod regex_builder;
 
