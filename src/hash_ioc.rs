@@ -26,15 +26,15 @@ pub struct HashIOCS<'a> {
     ssdeeps: Vec<HashIOC<'a>>,
 }
 
-const MD5_PATTERN: &'static str = r#"\b[A-Fa-f0-9]{32}\b"#;
+pub const MD5_PATTERN: &'static str = r#"\b[A-Fa-f0-9]{32}\b"#;
 
-const SHA1_PATTERN: &'static str = r#"\b[A-Fa-f0-9]{40}\b"#;
+pub const SHA1_PATTERN: &'static str = r#"\b[A-Fa-f0-9]{40}\b"#;
 
-const SHA256_PATTERN: &'static str = r#"\b[A-Fa-f0-9]{64}\b"#;
+pub const SHA256_PATTERN: &'static str = r#"\b[A-Fa-f0-9]{64}\b"#;
 
-const SHA512_PATTERN: &'static str = r#"\b[A-Fa-f0-9]{128}\b"#;
+pub const SHA512_PATTERN: &'static str = r#"\b[A-Fa-f0-9]{128}\b"#;
 
-const SSDEEP_PATTERN: &'static str = r#"\d{2}:[A-Za-z0-9/+]{3,}:[A-Za-z0-9/+]{3,}"#;
+pub const SSDEEP_PATTERN: &'static str = r#"\d{2}:[A-Za-z0-9/+]{3,}:[A-Za-z0-9/+]{3,}"#;
 
 pub fn parse_md5(input: &str) -> Vec<HashIOC> {
     lazy_static! {
