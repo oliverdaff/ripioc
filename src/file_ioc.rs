@@ -55,6 +55,16 @@ pub fn parse_doc(input: &str) -> Vec<FileIOC> {
     .collect()
 }
 
+pub fn parse_exe(input: &str) -> Vec<FileIOC> {
+    lazy_static! {
+        static ref EXE_RE: Box<Regex> = compile_re(Cow::from(EXE_PATTERN));
+    }
+    return EXE_RE
+    .find_iter(input)
+    .map(|x|FileIOC::EXE(x.as_str()))
+    .collect()
+}
+
 
 pub fn parse_file_iocs(input: &str) -> FileIOCS {
     lazy_static! {
@@ -76,7 +86,7 @@ pub fn parse_file_iocs(input: &str) -> FileIOCS {
 
     return FileIOCS{
         docs : if matches.matched(0) { parse_doc(input) } else { vec![]},
-        exes : vec![],
+        exes : if matches.matched(0) { parse_exe(input)} else { vec![]},
         flashs: vec![],
         imgs: vec![],
         macs : vec![],
@@ -90,10 +100,36 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_parse_file_iocs(){
+        assert_eq!(
+            parse_file_iocs(
+                "The report contains test.doc, test.exe"
+            ),
+            FileIOCS { 
+                docs: vec![FileIOC::DOC("test.doc")],
+                exes: vec![FileIOC::EXE("test.exe")],
+                flashs: vec![],
+                imgs: vec![],
+                macs: vec![],
+                webs: vec![],
+                zips: vec![]
+            }
+        )
+    }
+
+    #[test]
     fn test_parse_doc() {
         assert_eq!(
             parse_doc("this ioc testing.doc"),
             vec![FileIOC::DOC("testing.doc")]
+        )
+    }
+
+    #[test]
+    fn test_parse_exe() {
+        assert_eq!(
+            parse_exe("this ioc testing.exe"),
+            vec![FileIOC::EXE("testing.exe")]
         )
     }
 }
