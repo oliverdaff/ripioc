@@ -65,6 +65,15 @@ pub fn parse_exe(input: &str) -> Vec<FileIOC> {
     .collect()
 }
 
+pub fn parse_flash(input: &str) -> Vec<FileIOC> {
+    lazy_static! {
+        static ref FLASH_RE: Box<Regex> = compile_re(Cow::from(FLASH_PATTERN));
+    }
+    return FLASH_RE
+    .find_iter(input)
+    .map(|x|FileIOC::FLASH(x.as_str()))
+    .collect()
+}
 
 pub fn parse_file_iocs(input: &str) -> FileIOCS {
     lazy_static! {
@@ -86,8 +95,8 @@ pub fn parse_file_iocs(input: &str) -> FileIOCS {
 
     return FileIOCS{
         docs : if matches.matched(0) { parse_doc(input) } else { vec![]},
-        exes : if matches.matched(0) { parse_exe(input)} else { vec![]},
-        flashs: vec![],
+        exes : if matches.matched(1) { parse_exe(input)} else { vec![]},
+        flashs: if matches.matched(2) { parse_flash(input) } else { vec![]},
         imgs: vec![],
         macs : vec![],
         webs : vec![],
@@ -103,12 +112,14 @@ mod tests {
     fn test_parse_file_iocs(){
         assert_eq!(
             parse_file_iocs(
-                "The report contains test.doc, test.exe"
+                "The report contains test.doc, test.exe
+                test.flv
+                "
             ),
             FileIOCS { 
                 docs: vec![FileIOC::DOC("test.doc")],
                 exes: vec![FileIOC::EXE("test.exe")],
-                flashs: vec![],
+                flashs: vec![FileIOC::FLASH("test.flv")],
                 imgs: vec![],
                 macs: vec![],
                 webs: vec![],
@@ -130,6 +141,14 @@ mod tests {
         assert_eq!(
             parse_exe("this ioc testing.exe"),
             vec![FileIOC::EXE("testing.exe")]
+        )
+    }
+
+    #[test]
+    fn test_parse_flash() {
+        assert_eq!(
+            parse_flash("this ioc testing.flv"),
+            vec![FileIOC::FLASH("testing.flv")]
         )
     }
 }
