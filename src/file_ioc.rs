@@ -38,11 +38,11 @@ pub const FLASH_PATTERN: &'static str = r#"([\w\-]+)\.(flv|swf)"#;
 
 pub const IMG_PATTERN: &'static str = r#"([\w\-]+)\.(jpeg|jpg|gif|png|tiff|bmp)"#;
 
-pub const MAC_PATTERN: &'static str = r#"([%A-Za-z.\-_/ ]+\.(plist|app|pkg))"#;
+pub const MAC_PATTERN: &'static str = r#"([%A-Za-z\.\-_/ ]+\.(plist|app|pkg))"#;
 
 pub const WEB_PATTERN: &'static str = r#"(\w+\.(html|htm|php|jsp|asp))"#;
 
-pub const ZIP_PATTERN: &'static str = r#"([\w\-]+\\.(zip|zipx|7z|rar|tar|gz))"#;
+pub const ZIP_PATTERN: &'static str = r#"([\w\-]+\.(zip|zipx|7z|rar|tar|gz))"#;
 
 
 pub fn parse_doc(input: &str) -> Vec<FileIOC> {
@@ -105,6 +105,16 @@ pub fn parse_web(input: &str) -> Vec<FileIOC> {
     .collect()
 }
 
+pub fn parse_zip(input: &str) -> Vec<FileIOC> {
+    lazy_static! {
+        static ref ZIP_RE: Box<Regex> = compile_re(Cow::from(ZIP_PATTERN));
+    }
+    return ZIP_RE
+    .find_iter(input)
+    .map(|x| FileIOC::ZIP(x.as_str()))
+    .collect()
+}
+
 pub fn parse_file_iocs(input: &str) -> FileIOCS {
     lazy_static! {
         static ref FILE_PATTERNS: RegexSet = RegexSetBuilder::new(
@@ -130,7 +140,7 @@ pub fn parse_file_iocs(input: &str) -> FileIOCS {
         imgs: if matches.matched(3) { parse_img(input) } else { vec![]},
         macs : if matches.matched(4) { parse_mac(input) } else { vec![]},
         webs : if matches.matched(5) { parse_web(input) } else { vec![]},
-        zips : vec![],
+        zips : if matches.matched(6) { parse_zip(input) } else { vec![]}
     }
 }
 
@@ -143,7 +153,7 @@ mod tests {
         assert_eq!(
             parse_file_iocs(
                 "The report contains test.doc, test.exe
-                test.flv, test.png, test.app, admin.jsp
+                test.flv, test.png, test.app, admin.jsp, payload.zip
                 "
             ),
             FileIOCS { 
@@ -153,7 +163,7 @@ mod tests {
                 imgs: vec![FileIOC::IMG("test.png")],
                 macs: vec![FileIOC::MAC("test.app")],
                 webs: vec![FileIOC::WEB("admin.jsp")],
-                zips: vec![]
+                zips: vec![FileIOC::ZIP("payload.zip")],
             }
         )
     }
@@ -202,6 +212,14 @@ mod tests {
         assert_eq!(
             parse_web("this ioc admin.jsp"),
             vec![FileIOC::WEB("admin.jsp")]
+        )
+    }
+
+    #[test]
+    fn test_parse_zip(){
+        assert_eq!(
+            parse_zip("this payload.zip"),
+            vec![FileIOC::ZIP("payload.zip")]
         )
     }
 }
