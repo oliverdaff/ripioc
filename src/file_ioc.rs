@@ -38,7 +38,7 @@ pub const FLASH_PATTERN: &'static str = r#"([\w\-]+)\.(flv|swf)"#;
 
 pub const IMG_PATTERN: &'static str = r#"([\w\-]+)\.(jpeg|jpg|gif|png|tiff|bmp)"#;
 
-pub const MAC_PATTERN: &'static str = r#"([\w\-]+)\.(jpeg|jpg|gif|png|tiff|bmp)"#;
+pub const MAC_PATTERN: &'static str = r#"([%A-Za-z.\-_/ ]+\.(plist|app|pkg))"#;
 
 pub const WEB_PATTERN: &'static str = r#"(\w+\.(html|htm|php|jsp|asp))"#;
 
@@ -85,6 +85,16 @@ pub fn parse_img(input: &str) -> Vec<FileIOC> {
     .collect()
 }
 
+pub fn parse_mac(input: &str) -> Vec<FileIOC> {
+    lazy_static! {
+        static ref MAC_RE: Box<Regex> = compile_re(Cow::from(MAC_PATTERN));
+    }
+    return MAC_RE
+    .find_iter(input)
+    .map(|x|FileIOC::MAC(x.as_str()))
+    .collect()
+}
+
 pub fn parse_file_iocs(input: &str) -> FileIOCS {
     lazy_static! {
         static ref FILE_PATTERNS: RegexSet = RegexSetBuilder::new(
@@ -108,7 +118,7 @@ pub fn parse_file_iocs(input: &str) -> FileIOCS {
         exes : if matches.matched(1) { parse_exe(input)} else { vec![]},
         flashs: if matches.matched(2) { parse_flash(input) } else { vec![]},
         imgs: if matches.matched(3) { parse_img(input) } else { vec![]},
-        macs : vec![],
+        macs : if matches.matched(4) { parse_mac(input) } else { vec![]},
         webs : vec![],
         zips : vec![],
     }
@@ -123,7 +133,7 @@ mod tests {
         assert_eq!(
             parse_file_iocs(
                 "The report contains test.doc, test.exe
-                test.flv, test.png
+                test.flv, test.png, test.app
                 "
             ),
             FileIOCS { 
@@ -131,7 +141,7 @@ mod tests {
                 exes: vec![FileIOC::EXE("test.exe")],
                 flashs: vec![FileIOC::FLASH("test.flv")],
                 imgs: vec![FileIOC::IMG("test.png")],
-                macs: vec![],
+                macs: vec![FileIOC::MAC("test.app")],
                 webs: vec![],
                 zips: vec![]
             }
@@ -167,6 +177,14 @@ mod tests {
         assert_eq!(
             parse_img("this ioc testing.png"),
             vec![FileIOC::IMG("testing.png")]
+        )
+    }
+
+    #[test]
+    fn test_parse_mac() {
+        assert_eq!(
+            parse_mac("this ioc testing.app"),
+            vec![FileIOC::MAC("testing.app")]
         )
     }
 }
