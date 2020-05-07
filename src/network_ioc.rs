@@ -1,4 +1,3 @@
-
 use regex::Regex;
 use regex::RegexSet;
 use regex::RegexSetBuilder;
@@ -15,6 +14,7 @@ pub enum NetworkIOC<'a> {
     EMAIL(&'a str),
     IPV4(&'a str),
     IPV6(&'a str),
+    HexURL(&'a str),
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -24,6 +24,7 @@ pub struct NetworkIOCS<'a> {
     emails: Vec<NetworkIOC<'a>>,
     ipv4s: Vec<NetworkIOC<'a>>,
     ipv6s: Vec<NetworkIOC<'a>>,
+    hexurls: Vec<NetworkIOC<'a>>,
 }
 
 pub const URL_PATTERN: &'static str =
@@ -63,7 +64,7 @@ pub const DOMAIN_PATTERN: &'static str = r#"([A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.(a
 
 pub const EMAIL_PATTERN: &'static str = r#"[A-Za-z0-9_.]+@[0-9a-z.-]+"#;
 
-pub const IPV4_PATTERN: &'static str = r#"(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)[?\.]?){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"#;
+pub const IPV4_PATTERN: &'static str = r#"(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"#;
 
 pub const IPV6_PATTERN: &'static str = r#"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|
                              ([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}
@@ -71,6 +72,20 @@ pub const IPV6_PATTERN: &'static str = r#"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1
                              ((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]
                                  |1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]
                                      |1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"#;
+
+pub const HEX_URL_PATTERN: &'static str = r#"
+                                            (
+                                                [46][86]
+                                                (?:[57]4)?
+                                                [57]4[57]0
+                                                (?:[57]3)?
+                                                3a2f2f
+                                                (?:2[356def]|3[0-9adf]|[46][0-9a-f]|[57][0-9af])+
+                                            )
+                                            (?:[046]0|2[0-2489a-c]|3[bce]|[57][b-e]|[8-f][0-9a-f]|0a|0d|09|[
+                                                \x5b-\x5d\x7b\x7d\x0a\x0d\x20
+                                            ]|$)
+                                        "#;
 
 pub fn parse_network_iocs(input: &str) -> NetworkIOCS {
     lazy_static! {
@@ -80,7 +95,8 @@ pub fn parse_network_iocs(input: &str) -> NetworkIOCS {
                 EMAIL_PATTERN,     //1
                 DOMAIN_PATTERN,    //2
                 IPV6_PATTERN,      //3
-                IPV4_PATTERN       //4
+                IPV4_PATTERN,      //4
+                HEX_URL_PATTERN    //5
         ]
         )
         .case_insensitive(true)
@@ -114,7 +130,22 @@ pub fn parse_network_iocs(input: &str) -> NetworkIOCS {
         } else {
             vec![]
         },
+        hexurls: if matches.matched(5) {
+            parse_hex_url(input)
+        } else {
+            vec![]
+        },
     };
+}
+
+pub fn parse_hex_url(input: &str) -> Vec<NetworkIOC> {
+    lazy_static! {
+        static ref HEX_URL_RE: Box<Regex> = compile_re(Cow::from(HEX_URL_PATTERN));
+    }
+    return HEX_URL_RE
+        .find_iter(input)
+        .map(|x| NetworkIOC::HexURL(x.as_str().trim_end()))
+        .collect();
 }
 
 pub fn parse_ipv6(input: &str) -> Vec<NetworkIOC> {
@@ -211,16 +242,39 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_hex_url() {
+        assert_eq!(
+            parse_hex_url("this has an hex encoded url 687474703A2F2F7777772E726970696F632E636F63"),
+            vec![NetworkIOC::HexURL(
+                "687474703A2F2F7777772E726970696F632E636F63"
+            )]
+        );
+    }
+
+    #[test]
     fn test_parse_network_iocs() {
-        let results = parse_network_iocs("127.0.0.1 www.test.com");
+        let results = parse_network_iocs(
+            "
+        127.0.0.1 www.test.com
+        http://www.ripioc.com/url
+        some_ioc@iocrip.com
+        2001:0db8:85a3:0000:0000:8a2e:0370:7334
+        687474703A2F2F7777772E726970696F632E636F63 some other text
+        ",
+        );
         assert_eq!(
             results,
             NetworkIOCS {
-                urls: vec![],
-                domains: vec![NetworkIOC::DOMAIN("www.test.com")],
-                emails: vec![],
+                urls: vec![NetworkIOC::URL("http://www.ripioc.com/url")],
+                domains: vec![
+                    NetworkIOC::DOMAIN("www.test.com"),
+                    NetworkIOC::DOMAIN("www.ripioc.com"),
+                    NetworkIOC::DOMAIN("iocrip.com")
+                ],
+                emails: vec![NetworkIOC::EMAIL("some_ioc@iocrip.com")],
                 ipv4s: vec![NetworkIOC::IPV4("127.0.0.1")],
-                ipv6s: vec![],
+                ipv6s: vec![NetworkIOC::IPV6("2001:0db8:85a3:0000:0000:8a2e:0370:7334")],
+                hexurls: vec![NetworkIOC::HexURL("687474703A2F2F7777772E726970696F632E636F63")]
             }
         )
     }

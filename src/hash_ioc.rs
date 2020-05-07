@@ -57,33 +57,36 @@ pub fn parse_sha1(input: &str) -> Vec<HashIOC> {
 }
 
 pub fn parse_sha256(input: &str) -> Vec<HashIOC> {
-    lazy_static!{
+    lazy_static! {
         static ref SHA256_RE: Box<Regex> = compile_re(Cow::from(SHA256_PATTERN));
     }
-    SHA256_RE.find_iter(input)
-    .map(|x|x.as_str())
-    .map(HashIOC::SHA256)
-    .collect()
+    SHA256_RE
+        .find_iter(input)
+        .map(|x| x.as_str())
+        .map(HashIOC::SHA256)
+        .collect()
 }
 
 pub fn parse_sha512(input: &str) -> Vec<HashIOC> {
     lazy_static! {
         static ref SHA512_RE: Box<Regex> = compile_re(Cow::from(SHA512_PATTERN));
     }
-    SHA512_RE.find_iter(input)
-    .map(|x|x.as_str())
-    .map(HashIOC::SHA512)
-    .collect()
+    SHA512_RE
+        .find_iter(input)
+        .map(|x| x.as_str())
+        .map(HashIOC::SHA512)
+        .collect()
 }
 
 pub fn parse_ssdeep(input: &str) -> Vec<HashIOC> {
     lazy_static! {
         static ref SSDEEP_RE: Box<Regex> = compile_re(Cow::from(SSDEEP_PATTERN));
     }
-    SSDEEP_RE.find_iter(input)
-    .map(|x|x.as_str())
-    .map(HashIOC::SSDEEP)
-    .collect()
+    SSDEEP_RE
+        .find_iter(input)
+        .map(|x| x.as_str())
+        .map(HashIOC::SSDEEP)
+        .collect()
 }
 
 pub fn parse_hash_iocs(input: &str) -> HashIOCS {
@@ -103,15 +106,34 @@ pub fn parse_hash_iocs(input: &str) -> HashIOCS {
 
     let matches = HASH_PATTERNS.matches(input);
 
-    return HashIOCS{
-        md5s : if matches.matched(0) { parse_md5(input) } else { vec![]},
-        sha1s : if matches.matched(1) { parse_sha1(input) } else { vec![]},
-        sha256s : if matches.matched(2) { parse_sha256(input) } else { vec![]},
-        sha512s : if matches.matched(3) { parse_sha512(input) } else { vec![]},
-        ssdeeps : if matches.matched(3) { parse_ssdeep(input) } else { vec![]},
-    }
+    return HashIOCS {
+        md5s: if matches.matched(0) {
+            parse_md5(input)
+        } else {
+            vec![]
+        },
+        sha1s: if matches.matched(1) {
+            parse_sha1(input)
+        } else {
+            vec![]
+        },
+        sha256s: if matches.matched(2) {
+            parse_sha256(input)
+        } else {
+            vec![]
+        },
+        sha512s: if matches.matched(3) {
+            parse_sha512(input)
+        } else {
+            vec![]
+        },
+        ssdeeps: if matches.matched(3) {
+            parse_ssdeep(input)
+        } else {
+            vec![]
+        },
+    };
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -134,26 +156,34 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_sha256(){
+    fn test_parse_sha256() {
         assert_eq!(
-            parse_sha256("this is a 05cc5051bfa5c2c356422f930e3f78dd63dd1252c98bf5e154c0e1a64a4b5532"),
-            vec![HashIOC::SHA256("05cc5051bfa5c2c356422f930e3f78dd63dd1252c98bf5e154c0e1a64a4b5532")]
+            parse_sha256(
+                "this is a 05cc5051bfa5c2c356422f930e3f78dd63dd1252c98bf5e154c0e1a64a4b5532"
+            ),
+            vec![HashIOC::SHA256(
+                "05cc5051bfa5c2c356422f930e3f78dd63dd1252c98bf5e154c0e1a64a4b5532"
+            )]
         )
     }
 
     #[test]
-    fn test_parse_sha512(){
+    fn test_parse_sha512() {
         assert_eq!(
-            parse_sha512("
+            parse_sha512(
+                "
             this is a 5671025d77521321db8be6e150d66d67c79d2ce43b203207a03710fbff10e1\
-            7800179803b4f974c75816a9dd8c3697a2f32fbb2d2b1cff2933f6a9e575061a32"),
-            vec![HashIOC::SHA512("5671025d77521321db8be6e150d66d67c79d2ce43b203207a\
-            03710fbff10e17800179803b4f974c75816a9dd8c3697a2f32fbb2d2b1cff2933f6a9e575061a32")]
+            7800179803b4f974c75816a9dd8c3697a2f32fbb2d2b1cff2933f6a9e575061a32"
+            ),
+            vec![HashIOC::SHA512(
+                "5671025d77521321db8be6e150d66d67c79d2ce43b203207a\
+            03710fbff10e17800179803b4f974c75816a9dd8c3697a2f32fbb2d2b1cff2933f6a9e575061a32"
+            )]
         )
     }
 
     #[test]
-    fn test_parse_ssdeep(){
+    fn test_parse_ssdeep() {
         assert_eq!(
             parse_ssdeep("
             this is a 96:s4Ud1Lj96tHHlZDrwciQmA+4uy1I0G4HYuL8N3TzS8QsO/wqWXLcMSx:sF1LjEtHHlZDrJzrhuyZvHYm8tKp/RWO xxx"),
@@ -162,7 +192,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_hash_iocs(){
+    fn test_parse_hash_iocs() {
         assert_eq!(parse_hash_iocs("
         08f2eb5f1bcbaf25ba97aef26593ed96
 
