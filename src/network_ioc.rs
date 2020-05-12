@@ -64,7 +64,8 @@ pub const DOMAIN_PATTERN: &'static str = r#"([A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.(a
 
 pub const EMAIL_PATTERN: &'static str = r#"[A-Za-z0-9_.]+@[0-9a-z.-]+"#;
 
-pub const IPV4_PATTERN: &'static str = r#"(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"#;
+pub const IPV4_PATTERN: &'static str =
+    r#"(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"#;
 
 pub const IPV6_PATTERN: &'static str = r#"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|
                              ([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}
@@ -274,7 +275,9 @@ mod tests {
                 emails: vec![NetworkIOC::EMAIL("some_ioc@iocrip.com")],
                 ipv4s: vec![NetworkIOC::IPV4("127.0.0.1")],
                 ipv6s: vec![NetworkIOC::IPV6("2001:0db8:85a3:0000:0000:8a2e:0370:7334")],
-                hexurls: vec![NetworkIOC::HexURL("687474703A2F2F7777772E726970696F632E636F63")]
+                hexurls: vec![NetworkIOC::HexURL(
+                    "687474703A2F2F7777772E726970696F632E636F63"
+                )]
             }
         )
     }
