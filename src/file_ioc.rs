@@ -21,7 +21,54 @@
 //! 
 //! let docs = parse_doc("The exploit was delivered via test.doc");
 //! ```
-//! 
+//!
+//! # List of file types considered.
+//!  
+//! *   Document type files.
+//!     *   docx
+//!     *   doc
+//!     *   csv
+//!     *   pdf
+//!     *   xlsx
+//!     *   xls
+//!     *   rtf
+//!     *   txt
+//!     *   pptx
+//!     *   ppt
+//!     *   pages
+//!     *   keynote
+//!     *   numbers
+//! *   Executable files
+//!     *   exe
+//!     *   dll
+//!     *   jar
+//! *   Flash files
+//!     * flv
+//!     * swf
+//! *   Image files
+//!     *   jpeg
+//!     *   jpg
+//!     *   gif
+//!     *   png
+//!     *   tiff
+//!     *   bmp
+//! *   Mac files
+//!     *   plist
+//!     *   app
+//!     *   pkg
+//! *   Web files
+//!     *   html
+//!     *   htm
+//!     *   php
+//!     *   jsp
+//!     *   asp
+//! *   Compressed files
+//!     *   zip
+//!     *   zipx
+//!     *   7z
+//!     *   rar
+//!     *   tar
+//!     *   gz
 use crate::regex_builder::compile_re;
 
 use std::boxed::Box;
