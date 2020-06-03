@@ -1,3 +1,27 @@
+//! Contains patterns to match file indicators in text.
+//! 
+//! This module can be used to extract single document types
+//! from text, using specific methods, or extract all document
+//! IOCs using `parse_file_iocs`.
+//! 
+//! #Examples
+//! 
+//!## Extract all document IOCs from the input text
+//! ```
+//! use ripioc::file_ioc::parse_file_iocs;
+//! 
+//! let all_docs = parse_file_iocs("The exploit was via bad.doc and\
+//!                     malicious.exe");
+//! 
+//! ```
+//! 
+//! ## Extract just doc files
+//! ```
+//! use ripioc::file_ioc::parse_doc;
+//! 
+//! let docs = parse_doc("The exploit was delivered via test.doc");
+//! ```
+//! 
 use crate::regex_builder::compile_re;
 
 use std::boxed::Box;
@@ -8,43 +32,103 @@ use regex::Regex;
 use regex::RegexSet;
 use regex::RegexSetBuilder;
 
+/// Different types of documents used as an IOC
 #[derive(Debug, PartialEq, Eq)]
 pub enum FileIOC<'a> {
+    /// Document type files.
+    /// Specifically
+    /// *   docx
+    /// *   doc
+    /// *   csv
+    /// *   pdf
+    /// *   xlsx
+    /// *   xls
+    /// *   rtf
+    /// *   txt
+    /// *   pptx
+    /// *   ppt
+    /// *   pages
+    /// *   keynote
+    /// *   numbers
     DOC(&'a str),
+    /// Executable files, specifically:
+    /// *   exe
+    /// *   dll
+    /// *   jar
     EXE(&'a str),
+    /// Flash files, specifically:
+    /// * flv
+    /// * swf
     FLASH(&'a str),
+    /// Image files, specifically:
+    /// *   jpeg
+    /// *   jpg
+    /// *   gif
+    /// *   png
+    /// *   tiff
+    /// *   bmp
     IMG(&'a str),
+    /// Mac files, specifically:
+    /// *   plist
+    /// *   app
+    /// *   pkg
     MAC(&'a str),
+    /// Web files, specifically:
+    /// *   html
+    /// *   htm
+    /// *   php
+    /// *   jsp
+    /// *   asp
     WEB(&'a str),
+    /// Compressed files, specifically:
+    /// *   zip
+    /// *   zipx
+    /// *   7z
+    /// *   rar
+    /// *   tar
+    /// *   gz
     ZIP(&'a str),
 }
 
+/// A collection of document IOC, partioned by document type
 #[derive(Debug, PartialEq, Eq)]
 pub struct FileIOCS<'a> {
+    /// Document iocs, found in the text
     docs: Vec<FileIOC<'a>>,
+    /// Exe iocs, found in the text
     exes: Vec<FileIOC<'a>>,
+    /// flash iocs, found in the text
     flashs: Vec<FileIOC<'a>>,
+    /// img iocs, found in the text
     imgs: Vec<FileIOC<'a>>,
+    /// mac iocs, found in the text
     macs: Vec<FileIOC<'a>>,
+    /// web iocs, found in the text
     webs: Vec<FileIOC<'a>>,
+    /// zip iocs, found in the text
     zips: Vec<FileIOC<'a>>,
 }
 
-pub const DOC_PATTERN: &'static str =
+const DOC_PATTERN: &'static str =
     r#"([\w\-]+)\.(docx|doc|csv|pdf|xlsx|xls|rtf|txt|pptx|ppt|pages|keynote|numbers)"#;
 
-pub const EXE_PATTERN: &'static str = r#"([\w]+)\.(exe|dll|jar)"#;
+const EXE_PATTERN: &'static str = r#"([\w]+)\.(exe|dll|jar)"#;
 
-pub const FLASH_PATTERN: &'static str = r#"([\w\-]+)\.(flv|swf)"#;
+const FLASH_PATTERN: &'static str = r#"([\w\-]+)\.(flv|swf)"#;
 
-pub const IMG_PATTERN: &'static str = r#"([\w\-]+)\.(jpeg|jpg|gif|png|tiff|bmp)"#;
+const IMG_PATTERN: &'static str = r#"([\w\-]+)\.(jpeg|jpg|gif|png|tiff|bmp)"#;
 
-pub const MAC_PATTERN: &'static str = r#"([%A-Za-z\.\-_/ ]+\.(plist|app|pkg))"#;
+const MAC_PATTERN: &'static str = r#"([%A-Za-z\.\-_/ ]+\.(plist|app|pkg))"#;
 
-pub const WEB_PATTERN: &'static str = r#"(\w+\.(html|htm|php|jsp|asp))"#;
+const WEB_PATTERN: &'static str = r#"(\w+\.(html|htm|php|jsp|asp))"#;
 
-pub const ZIP_PATTERN: &'static str = r#"([\w\-]+\.(zip|zipx|7z|rar|tar|gz))"#;
+const ZIP_PATTERN: &'static str = r#"([\w\-]+\.(zip|zipx|7z|rar|tar|gz))"#;
 
+///Parse all document IOCs found in the input text.
+/// # Arguments
+/// * input - input text to parse
+/// # Return
+/// A vector of document IOCs found in the input text.
 pub fn parse_doc(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref DOC_RE: Box<Regex> = compile_re(Cow::from(DOC_PATTERN));
@@ -55,6 +139,11 @@ pub fn parse_doc(input: &str) -> Vec<FileIOC> {
         .collect();
 }
 
+/// Parse all excutable file types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// a vector of executable IOCs found in the input text.
 pub fn parse_exe(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref EXE_RE: Box<Regex> = compile_re(Cow::from(EXE_PATTERN));
@@ -65,6 +154,11 @@ pub fn parse_exe(input: &str) -> Vec<FileIOC> {
         .collect();
 }
 
+/// Parse all flash file types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// a vector of flash IOCs found in the input text.
 pub fn parse_flash(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref FLASH_RE: Box<Regex> = compile_re(Cow::from(FLASH_PATTERN));
@@ -75,6 +169,11 @@ pub fn parse_flash(input: &str) -> Vec<FileIOC> {
         .collect();
 }
 
+/// Parse all image file types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// a vector of image IOCs found in the input text.
 pub fn parse_img(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref IMG_RE: Box<Regex> = compile_re(Cow::from(IMG_PATTERN));
@@ -85,6 +184,11 @@ pub fn parse_img(input: &str) -> Vec<FileIOC> {
         .collect();
 }
 
+/// Parse all mac file types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// a vector of mac IOCs found in the input text.
 pub fn parse_mac(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref MAC_RE: Box<Regex> = compile_re(Cow::from(MAC_PATTERN));
@@ -95,6 +199,11 @@ pub fn parse_mac(input: &str) -> Vec<FileIOC> {
         .collect();
 }
 
+/// Parse all web file types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// a vector of web IOCs found in the input text.
 pub fn parse_web(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref WEB_RE: Box<Regex> = compile_re(Cow::from(WEB_PATTERN));
@@ -105,6 +214,11 @@ pub fn parse_web(input: &str) -> Vec<FileIOC> {
         .collect();
 }
 
+/// Parse all compressed file types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// a vector of compressed IOCs found in the input text.
 pub fn parse_zip(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref ZIP_RE: Box<Regex> = compile_re(Cow::from(ZIP_PATTERN));
@@ -114,7 +228,12 @@ pub fn parse_zip(input: &str) -> Vec<FileIOC> {
         .map(|x| FileIOC::ZIP(x.as_str()))
         .collect();
 }
-
+/// Parse all file types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// A [`FileIOCS`](struct.FileIOCS.html) struct containing
+/// all the file iocs found in the input text.
 pub fn parse_file_iocs(input: &str) -> FileIOCS {
     lazy_static! {
         static ref FILE_PATTERNS: RegexSet = RegexSetBuilder::new(
