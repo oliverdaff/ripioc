@@ -73,8 +73,6 @@ use crate::regex_builder::compile_re;
 
 use std::boxed::Box;
 
-use std::borrow::Cow;
-
 use regex::Regex;
 use regex::RegexSet;
 use regex::RegexSetBuilder;
@@ -178,7 +176,7 @@ const ZIP_PATTERN: &'static str = r#"([\w\-]+\.(zip|zipx|7z|rar|tar|gz))"#;
 /// A vector of document IOCs found in the input text.
 pub fn parse_doc(input: &str) -> Vec<FileIOC> {
     lazy_static! {
-        static ref DOC_RE: Box<Regex> = compile_re(Cow::from(DOC_PATTERN));
+        static ref DOC_RE: Box<Regex> = compile_re(DOC_PATTERN);
     }
     return DOC_RE
         .find_iter(input)
@@ -193,7 +191,7 @@ pub fn parse_doc(input: &str) -> Vec<FileIOC> {
 /// a vector of executable IOCs found in the input text.
 pub fn parse_exe(input: &str) -> Vec<FileIOC> {
     lazy_static! {
-        static ref EXE_RE: Box<Regex> = compile_re(Cow::from(EXE_PATTERN));
+        static ref EXE_RE: Box<Regex> = compile_re(EXE_PATTERN);
     }
     return EXE_RE
         .find_iter(input)
@@ -208,7 +206,7 @@ pub fn parse_exe(input: &str) -> Vec<FileIOC> {
 /// a vector of flash IOCs found in the input text.
 pub fn parse_flash(input: &str) -> Vec<FileIOC> {
     lazy_static! {
-        static ref FLASH_RE: Box<Regex> = compile_re(Cow::from(FLASH_PATTERN));
+        static ref FLASH_RE: Box<Regex> = compile_re(FLASH_PATTERN);
     }
     return FLASH_RE
         .find_iter(input)
@@ -223,7 +221,7 @@ pub fn parse_flash(input: &str) -> Vec<FileIOC> {
 /// a vector of image IOCs found in the input text.
 pub fn parse_img(input: &str) -> Vec<FileIOC> {
     lazy_static! {
-        static ref IMG_RE: Box<Regex> = compile_re(Cow::from(IMG_PATTERN));
+        static ref IMG_RE: Box<Regex> = compile_re(IMG_PATTERN);
     }
     return IMG_RE
         .find_iter(input)
@@ -238,7 +236,7 @@ pub fn parse_img(input: &str) -> Vec<FileIOC> {
 /// a vector of mac IOCs found in the input text.
 pub fn parse_mac(input: &str) -> Vec<FileIOC> {
     lazy_static! {
-        static ref MAC_RE: Box<Regex> = compile_re(Cow::from(MAC_PATTERN));
+        static ref MAC_RE: Box<Regex> = compile_re(MAC_PATTERN);
     }
     return MAC_RE
         .find_iter(input)
@@ -253,7 +251,7 @@ pub fn parse_mac(input: &str) -> Vec<FileIOC> {
 /// a vector of web IOCs found in the input text.
 pub fn parse_web(input: &str) -> Vec<FileIOC> {
     lazy_static! {
-        static ref WEB_RE: Box<Regex> = compile_re(Cow::from(WEB_PATTERN));
+        static ref WEB_RE: Box<Regex> = compile_re(WEB_PATTERN);
     }
     return WEB_RE
         .find_iter(input)
@@ -268,7 +266,7 @@ pub fn parse_web(input: &str) -> Vec<FileIOC> {
 /// a vector of compressed IOCs found in the input text.
 pub fn parse_zip(input: &str) -> Vec<FileIOC> {
     lazy_static! {
-        static ref ZIP_RE: Box<Regex> = compile_re(Cow::from(ZIP_PATTERN));
+        static ref ZIP_RE: Box<Regex> = compile_re(ZIP_PATTERN);
     }
     return ZIP_RE
         .find_iter(input)

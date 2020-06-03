@@ -2,7 +2,6 @@ use regex::Regex;
 use regex::RegexSet;
 use regex::RegexSetBuilder;
 
-use std::borrow::Cow;
 use std::boxed::Box;
 
 use crate::regex_builder::compile_re;
@@ -141,7 +140,7 @@ pub fn parse_network_iocs(input: &str) -> NetworkIOCS {
 
 pub fn parse_hex_url(input: &str) -> Vec<NetworkIOC> {
     lazy_static! {
-        static ref HEX_URL_RE: Box<Regex> = compile_re(Cow::from(HEX_URL_PATTERN));
+        static ref HEX_URL_RE: Box<Regex> = compile_re(HEX_URL_PATTERN);
     }
     return HEX_URL_RE
         .find_iter(input)
@@ -151,7 +150,7 @@ pub fn parse_hex_url(input: &str) -> Vec<NetworkIOC> {
 
 pub fn parse_ipv6(input: &str) -> Vec<NetworkIOC> {
     lazy_static! {
-        static ref IPV6_RE: Box<Regex> = compile_re(Cow::from(IPV6_PATTERN));
+        static ref IPV6_RE: Box<Regex> = compile_re(IPV6_PATTERN);
     }
     return IPV6_RE
         .find_iter(input)
@@ -161,7 +160,7 @@ pub fn parse_ipv6(input: &str) -> Vec<NetworkIOC> {
 
 pub fn parse_ipv4(input: &str) -> Vec<NetworkIOC> {
     lazy_static! {
-        static ref IPV4_RE: Box<Regex> = compile_re(Cow::from(IPV4_PATTERN));
+        static ref IPV4_RE: Box<Regex> = compile_re(IPV4_PATTERN);
     }
     return IPV4_RE
         .find_iter(input)
@@ -171,7 +170,7 @@ pub fn parse_ipv4(input: &str) -> Vec<NetworkIOC> {
 
 pub fn parse_urls(input: &str) -> Vec<NetworkIOC> {
     lazy_static! {
-        static ref URL_RE: Box<Regex> = compile_re(Cow::from(URL_PATTERN));
+        static ref URL_RE: Box<Regex> = compile_re(URL_PATTERN);
     }
     return URL_RE
         .find_iter(input)
@@ -181,7 +180,7 @@ pub fn parse_urls(input: &str) -> Vec<NetworkIOC> {
 
 pub fn parse_domains(input: &str) -> Vec<NetworkIOC> {
     lazy_static! {
-        static ref DOMAIN_RE: Box<Regex> = compile_re(Cow::from(DOMAIN_PATTERN));
+        static ref DOMAIN_RE: Box<Regex> = compile_re(DOMAIN_PATTERN);
     }
     return DOMAIN_RE
         .find_iter(input)
@@ -191,7 +190,7 @@ pub fn parse_domains(input: &str) -> Vec<NetworkIOC> {
 
 pub fn parse_emails(input: &str) -> Vec<NetworkIOC> {
     lazy_static! {
-        static ref EMAIL_RE: Box<Regex> = compile_re(Cow::from(EMAIL_PATTERN));
+        static ref EMAIL_RE: Box<Regex> = compile_re(EMAIL_PATTERN);
     }
     return EMAIL_RE
         .find_iter(input)

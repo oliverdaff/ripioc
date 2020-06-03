@@ -2,8 +2,6 @@ use crate::regex_builder::compile_re;
 
 use std::boxed::Box;
 
-use std::borrow::Cow;
-
 use regex::Regex;
 use regex::RegexSet;
 use regex::RegexSetBuilder;
@@ -38,7 +36,7 @@ pub const SSDEEP_PATTERN: &'static str = r#"\d{2}:[A-Za-z0-9/+]{3,}:[A-Za-z0-9/+
 
 pub fn parse_md5(input: &str) -> Vec<HashIOC> {
     lazy_static! {
-        static ref MD5_RE: Box<Regex> = compile_re(Cow::from(MD5_PATTERN));
+        static ref MD5_RE: Box<Regex> = compile_re(MD5_PATTERN);
     }
     return MD5_RE
         .find_iter(input)
@@ -48,7 +46,7 @@ pub fn parse_md5(input: &str) -> Vec<HashIOC> {
 
 pub fn parse_sha1(input: &str) -> Vec<HashIOC> {
     lazy_static! {
-        static ref SHA1_RE: Box<Regex> = compile_re(Cow::from(SHA1_PATTERN));
+        static ref SHA1_RE: Box<Regex> = compile_re(SHA1_PATTERN);
     }
     return SHA1_RE
         .find_iter(input)
@@ -58,7 +56,7 @@ pub fn parse_sha1(input: &str) -> Vec<HashIOC> {
 
 pub fn parse_sha256(input: &str) -> Vec<HashIOC> {
     lazy_static! {
-        static ref SHA256_RE: Box<Regex> = compile_re(Cow::from(SHA256_PATTERN));
+        static ref SHA256_RE: Box<Regex> = compile_re(SHA256_PATTERN);
     }
     SHA256_RE
         .find_iter(input)
@@ -69,7 +67,7 @@ pub fn parse_sha256(input: &str) -> Vec<HashIOC> {
 
 pub fn parse_sha512(input: &str) -> Vec<HashIOC> {
     lazy_static! {
-        static ref SHA512_RE: Box<Regex> = compile_re(Cow::from(SHA512_PATTERN));
+        static ref SHA512_RE: Box<Regex> = compile_re(SHA512_PATTERN);
     }
     SHA512_RE
         .find_iter(input)
@@ -80,7 +78,7 @@ pub fn parse_sha512(input: &str) -> Vec<HashIOC> {
 
 pub fn parse_ssdeep(input: &str) -> Vec<HashIOC> {
     lazy_static! {
-        static ref SSDEEP_RE: Box<Regex> = compile_re(Cow::from(SSDEEP_PATTERN));
+        static ref SSDEEP_RE: Box<Regex> = compile_re(SSDEEP_PATTERN);
     }
     SSDEEP_RE
         .find_iter(input)
