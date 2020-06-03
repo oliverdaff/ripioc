@@ -1,29 +1,29 @@
 //! Contains patterns to match file indicators in text.
-//! 
+//!
 //! This module can be used to extract single document types
 //! from text, using specific methods, or extract all document
 //! IOCs using `parse_file_iocs`.
-//! 
+//!
 //! #Examples
-//! 
+//!
 //!## Extract all document IOCs from the input text
 //! ```
 //! use ripioc::file_ioc::parse_file_iocs;
-//! 
+//!
 //! let all_docs = parse_file_iocs("The exploit was via bad.doc and\
 //!                     malicious.exe");
-//! 
+//!
 //! ```
-//! 
+//!
 //! ## Extract just doc files
 //! ```
 //! use ripioc::file_ioc::parse_doc;
-//! 
+//!
 //! let docs = parse_doc("The exploit was delivered via test.doc");
 //! ```
 //!
 //! # List of file types considered.
-//!  
+//!
 //! *   Document type files.
 //!     *   docx
 //!     *   doc
