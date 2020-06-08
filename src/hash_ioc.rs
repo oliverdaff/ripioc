@@ -79,10 +79,10 @@ pub fn parse_md5(input: &str) -> Vec<HashIOC> {
     lazy_static! {
         static ref MD5_RE: Box<Regex> = compile_re(MD5_PATTERN);
     }
-    return MD5_RE
+    MD5_RE
         .find_iter(input)
         .map(|x| HashIOC::MD5(x.as_str()))
-        .collect();
+        .collect()
 }
 
 ///Parse all SHA1 IOCs found in the input text.
@@ -94,10 +94,10 @@ pub fn parse_sha1(input: &str) -> Vec<HashIOC> {
     lazy_static! {
         static ref SHA1_RE: Box<Regex> = compile_re(SHA1_PATTERN);
     }
-    return SHA1_RE
+    SHA1_RE
         .find_iter(input)
         .map(|x| HashIOC::SHA1(x.as_str()))
-        .collect();
+        .collect()
 }
 ///Parse all SHA256 IOCs found in the input text.
 /// # Arguments
@@ -170,7 +170,7 @@ pub fn parse_hash_iocs(input: &str) -> HashIOCS {
 
     let matches = HASH_PATTERNS.matches(input);
 
-    return HashIOCS {
+    HashIOCS {
         md5s: if matches.matched(0) {
             parse_md5(input)
         } else {
@@ -196,7 +196,7 @@ pub fn parse_hash_iocs(input: &str) -> HashIOCS {
         } else {
             vec![]
         },
-    };
+    }
 }
 
 #[cfg(test)]
