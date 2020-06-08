@@ -1,23 +1,23 @@
 //! Contains patterns to match network indicators in the input text.
-//! 
+//!
 //! This module can be used to extract single network ioc types
 //! from text, using specific methods, or extract all network
 //! IOC types using `parse_network_iocs`.
-//! 
+//!
 //! # Examples
-//! 
+//!
 //! ## Extract all network IOCs from the input text.
 //! ```
 //! use ripioc::network_ioc::parse_network_iocs;
-//! 
+//!
 //! let all_network_iocs = parse_network_iocs("The exploit used\
 //!                     http://www.test.com as C2.");
 //! ```
-//! 
+//!
 //! ### Extract just the URL pattern
 //! ```
 //! use ripioc::network_ioc::parse_urls;
-//! 
+//!
 //! let all_urls = parse_urls("Traffic was set to http://www.test.com ");
 //! ```
 
