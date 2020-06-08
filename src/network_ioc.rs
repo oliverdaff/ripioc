@@ -1,3 +1,26 @@
+//! Contains patterns to match network indicators in the input text.
+//! 
+//! This module can be used to extract single network ioc types
+//! from text, using specific methods, or extract all network
+//! IOC types using `parse_network_iocs`.
+//! 
+//! # Examples
+//! 
+//! ## Extract all network IOCs from the input text.
+//! ```
+//! use ripioc::network_ioc::parse_network_iocs;
+//! 
+//! let all_network_iocs = parse_network_iocs("The exploit used\
+//!                     http://www.test.com as C2.");
+//! ```
+//! 
+//! ### Extract just the URL pattern
+//! ```
+//! use ripioc::network_ioc::parse_urls;
+//! 
+//! let all_urls = parse_urls("Traffic was set to http://www.test.com ");
+//! ```
+
 use regex::Regex;
 use regex::RegexSet;
 use regex::RegexSetBuilder;
@@ -6,29 +29,43 @@ use std::boxed::Box;
 
 use crate::regex_builder::compile_re;
 
+/// Different types of network types of IOC.
 #[derive(Debug, PartialEq, Eq)]
 pub enum NetworkIOC<'a> {
+    /// URL type network ioc
     URL(&'a str),
+    /// Domain type network ioc.
     DOMAIN(&'a str),
+    /// Email type network ioc.
     EMAIL(&'a str),
+    /// IPV4 type network ioc.
     IPV4(&'a str),
+    /// IPv6 type network ioc.
     IPV6(&'a str),
+    /// Hex encoded URL type network ioc.
     HexURL(&'a str),
 }
 
+/// A collection of network IOC, partioned network ioc type.
 #[derive(Debug, PartialEq, Eq)]
 pub struct NetworkIOCS<'a> {
+    /// URL IOCs, found in the text.
     urls: Vec<NetworkIOC<'a>>,
+    /// Domain IOCs, found in the text.
     domains: Vec<NetworkIOC<'a>>,
+    /// Email IOCs, found in the text.
     emails: Vec<NetworkIOC<'a>>,
+    /// IPV4 IOCs, found in the text.
     ipv4s: Vec<NetworkIOC<'a>>,
+    /// IPv6 IOCs, found in the text.
     ipv6s: Vec<NetworkIOC<'a>>,
+    /// HexURL IOCs, found in the text.
     hexurls: Vec<NetworkIOC<'a>>,
 }
 
-pub const URL_PATTERN: &'static str =
+const URL_PATTERN: &str =
     r#"(\b((http|https|hxxp|hxxps|nntp|ntp|rdp|sftp|smtp|ssh|tor|webdav|xmpp)://[\S]{1,})\b)"#;
-pub const DOMAIN_PATTERN: &'static str = r#"([A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.(abogado|ac|academy|accountants|active|actor|ad|adult|ae|aero|af|ag|
+const DOMAIN_PATTERN: &str = r#"([A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.(abogado|ac|academy|accountants|active|actor|ad|adult|ae|aero|af|ag|
      agency|ai|airforce|al|allfinanz|alsace|am|amsterdam|an|android|ao|aq|aquarelle|ar|archi|army|arpa|as|asia|associates|at|
      attorney|au|auction|audio|autos|aw|ax|axa|az|ba|band|bank|bar|barclaycard|barclays|bargains|bayern|bb|bd|be|beer|berlin|
      best|bf|bg|bh|bi|bid|bike|bingo|bio|biz|bj|black|blackfriday|bloomberg|blue|bm|bmw|bn|bnpparibas|bo|boo|boutique|br|
@@ -61,19 +98,19 @@ pub const DOMAIN_PATTERN: &'static str = r#"([A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.(a
      vet|vg|vi|viajes|video|villas|vision|vlaanderen|vn|vodka|vote|voting|voto|voyage|vu|wales|wang|watch|webcam|website|wed|wedding|wf|
      whoswho|wien|wiki|williamhill|wme|work|works|world|ws|wtc|wtf|xyz|yachts|yandex|ye|yoga|yokohama|youtube|yt|za|zm|zone|zuerich|zw)\b)"#;
 
-pub const EMAIL_PATTERN: &'static str = r#"[A-Za-z0-9_.]+@[0-9a-z.-]+"#;
+const EMAIL_PATTERN: &str = r#"[A-Za-z0-9_.]+@[0-9a-z.-]+"#;
 
-pub const IPV4_PATTERN: &'static str =
+const IPV4_PATTERN: &str =
     r#"(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"#;
 
-pub const IPV6_PATTERN: &'static str = r#"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|
+const IPV6_PATTERN: &str = r#"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|
                              ([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}
                              (:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:
                              ((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]
                                  |1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]
                                      |1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"#;
 
-pub const HEX_URL_PATTERN: &'static str = r#"
+const HEX_URL_PATTERN: &str = r#"
                                             (
                                                 [46][86]
                                                 (?:[57]4)?
@@ -87,6 +124,12 @@ pub const HEX_URL_PATTERN: &'static str = r#"
                                             ]|$)
                                         "#;
 
+/// Parse all network types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// A [`NetworkIOCs`](struct.NetworkIOCs.html) struct containing
+/// all the network iocs found in the input text.
 pub fn parse_network_iocs(input: &str) -> NetworkIOCS {
     lazy_static! {
         static ref NETWORK_IOCS_RE: RegexSet = RegexSetBuilder::new(
@@ -104,7 +147,7 @@ pub fn parse_network_iocs(input: &str) -> NetworkIOCS {
         .build().unwrap();
     }
     let matches = NETWORK_IOCS_RE.matches(input);
-    return NetworkIOCS {
+    NetworkIOCS {
         urls: if matches.matched(0) {
             parse_urls(input)
         } else {
@@ -135,67 +178,97 @@ pub fn parse_network_iocs(input: &str) -> NetworkIOCS {
         } else {
             vec![]
         },
-    };
+    }
 }
 
+/// Parse all hex encoded URLs types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// a vector of hex encoded URLs IOCs found in the input text.
 pub fn parse_hex_url(input: &str) -> Vec<NetworkIOC> {
     lazy_static! {
         static ref HEX_URL_RE: Box<Regex> = compile_re(HEX_URL_PATTERN);
     }
-    return HEX_URL_RE
+    HEX_URL_RE
         .find_iter(input)
         .map(|x| NetworkIOC::HexURL(x.as_str().trim_end()))
-        .collect();
+        .collect()
 }
 
+/// Parse all IPV6 types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// a vector of IPV6 IOCs found in the input text.
 pub fn parse_ipv6(input: &str) -> Vec<NetworkIOC> {
     lazy_static! {
         static ref IPV6_RE: Box<Regex> = compile_re(IPV6_PATTERN);
     }
-    return IPV6_RE
+    IPV6_RE
         .find_iter(input)
         .map(|x| NetworkIOC::IPV6(x.as_str()))
-        .collect();
+        .collect()
 }
 
+/// Parse all IPV4 encoded URLs types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// a vector of IPV4 IOCs found in the input text.
 pub fn parse_ipv4(input: &str) -> Vec<NetworkIOC> {
     lazy_static! {
         static ref IPV4_RE: Box<Regex> = compile_re(IPV4_PATTERN);
     }
-    return IPV4_RE
+    IPV4_RE
         .find_iter(input)
         .map(|x| NetworkIOC::IPV4(x.as_str()))
-        .collect();
+        .collect()
 }
 
+/// Parse all URLs types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// a vector of URLs IOCs found in the input text.
 pub fn parse_urls(input: &str) -> Vec<NetworkIOC> {
     lazy_static! {
         static ref URL_RE: Box<Regex> = compile_re(URL_PATTERN);
     }
-    return URL_RE
+    URL_RE
         .find_iter(input)
         .map(|x| NetworkIOC::URL(x.as_str()))
-        .collect();
+        .collect()
 }
 
+/// Parse all domains types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// a vector of domains IOCs found in the input text.
 pub fn parse_domains(input: &str) -> Vec<NetworkIOC> {
     lazy_static! {
         static ref DOMAIN_RE: Box<Regex> = compile_re(DOMAIN_PATTERN);
     }
-    return DOMAIN_RE
+    DOMAIN_RE
         .find_iter(input)
         .map(|x| NetworkIOC::DOMAIN(x.as_str()))
-        .collect();
+        .collect()
 }
 
+/// Parse all email types found in the input text.
+/// # Arguments
+/// * `input` - input text to parse
+/// # Return
+/// a vector of email IOCs found in the input text.
 pub fn parse_emails(input: &str) -> Vec<NetworkIOC> {
     lazy_static! {
         static ref EMAIL_RE: Box<Regex> = compile_re(EMAIL_PATTERN);
     }
-    return EMAIL_RE
+    EMAIL_RE
         .find_iter(input)
         .map(|x| NetworkIOC::EMAIL(x.as_str()))
-        .collect();
+        .collect()
 }
 
 #[cfg(test)]
