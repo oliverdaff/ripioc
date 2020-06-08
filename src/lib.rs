@@ -68,10 +68,10 @@ pub struct IOCS<'a> {
 ///
 /// ```
 pub fn parse_all_iocs(input: &str) -> IOCS {
-    return IOCS {
+    IOCS {
         network_iocs: parse_network_iocs(input),
         hash_iocs: parse_hash_iocs(input),
         file_iocs: parse_file_iocs(input),
         cve_iocs: parse_cve(input),
-    };
+    }
 }

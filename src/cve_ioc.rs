@@ -23,7 +23,7 @@ pub enum CVEIOC<'a> {
     CVE(&'a str),
 }
 
-pub const CVE_PATTERN: &'static str = r#"(CVE-(19|20)\d{2}-\d{4,7})"#;
+pub const CVE_PATTERN: &str = r#"(CVE-(19|20)\d{2}-\d{4,7})"#;
 
 /// Returns all the CVEs found in the text.
 ///
@@ -38,10 +38,10 @@ pub fn parse_cve(input: &str) -> Vec<CVEIOC> {
     lazy_static! {
         static ref CVE_RE: Box<Regex> = compile_re(CVE_PATTERN);
     }
-    return CVE_RE
+    CVE_RE
         .find_iter(input)
         .map(|x| CVEIOC::CVE(x.as_str()))
-        .collect();
+        .collect()
 }
 
 #[cfg(test)]

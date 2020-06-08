@@ -60,15 +60,15 @@ pub struct HashIOCS<'a> {
     ssdeeps: Vec<HashIOC<'a>>,
 }
 
-const MD5_PATTERN: &'static str = r#"\b[A-Fa-f0-9]{32}\b"#;
+const MD5_PATTERN: &str = r#"\b[A-Fa-f0-9]{32}\b"#;
 
-const SHA1_PATTERN: &'static str = r#"\b[A-Fa-f0-9]{40}\b"#;
+const SHA1_PATTERN: &str = r#"\b[A-Fa-f0-9]{40}\b"#;
 
-const SHA256_PATTERN: &'static str = r#"\b[A-Fa-f0-9]{64}\b"#;
+const SHA256_PATTERN: &str = r#"\b[A-Fa-f0-9]{64}\b"#;
 
-const SHA512_PATTERN: &'static str = r#"\b[A-Fa-f0-9]{128}\b"#;
+const SHA512_PATTERN: &str = r#"\b[A-Fa-f0-9]{128}\b"#;
 
-const SSDEEP_PATTERN: &'static str = r#"\d{2}:[A-Za-z0-9/+]{3,}:[A-Za-z0-9/+]{3,}"#;
+const SSDEEP_PATTERN: &str = r#"\d{2}:[A-Za-z0-9/+]{3,}:[A-Za-z0-9/+]{3,}"#;
 
 ///Parse all MD5 IOCs found in the input text.
 /// # Arguments

@@ -154,20 +154,20 @@ pub struct FileIOCS<'a> {
     zips: Vec<FileIOC<'a>>,
 }
 
-const DOC_PATTERN: &'static str =
+const DOC_PATTERN: &str =
     r#"([\w\-]+)\.(docx|doc|csv|pdf|xlsx|xls|rtf|txt|pptx|ppt|pages|keynote|numbers)"#;
 
-const EXE_PATTERN: &'static str = r#"([\w]+)\.(exe|dll|jar)"#;
+const EXE_PATTERN: &str = r#"([\w]+)\.(exe|dll|jar)"#;
 
-const FLASH_PATTERN: &'static str = r#"([\w\-]+)\.(flv|swf)"#;
+const FLASH_PATTERN: &str = r#"([\w\-]+)\.(flv|swf)"#;
 
-const IMG_PATTERN: &'static str = r#"([\w\-]+)\.(jpeg|jpg|gif|png|tiff|bmp)"#;
+const IMG_PATTERN: &str = r#"([\w\-]+)\.(jpeg|jpg|gif|png|tiff|bmp)"#;
 
-const MAC_PATTERN: &'static str = r#"([%A-Za-z\.\-_/ ]+\.(plist|app|pkg))"#;
+const MAC_PATTERN: &str = r#"([%A-Za-z\.\-_/ ]+\.(plist|app|pkg))"#;
 
-const WEB_PATTERN: &'static str = r#"(\w+\.(html|htm|php|jsp|asp))"#;
+const WEB_PATTERN: &str = r#"(\w+\.(html|htm|php|jsp|asp))"#;
 
-const ZIP_PATTERN: &'static str = r#"([\w\-]+\.(zip|zipx|7z|rar|tar|gz))"#;
+const ZIP_PATTERN: &str = r#"([\w\-]+\.(zip|zipx|7z|rar|tar|gz))"#;
 
 ///Parse all document IOCs found in the input text.
 /// # Arguments
@@ -178,10 +178,10 @@ pub fn parse_doc(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref DOC_RE: Box<Regex> = compile_re(DOC_PATTERN);
     }
-    return DOC_RE
+    DOC_RE
         .find_iter(input)
         .map(|x| FileIOC::DOC(x.as_str()))
-        .collect();
+        .collect()
 }
 
 /// Parse all excutable file types found in the input text.
@@ -193,10 +193,10 @@ pub fn parse_exe(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref EXE_RE: Box<Regex> = compile_re(EXE_PATTERN);
     }
-    return EXE_RE
+    EXE_RE
         .find_iter(input)
         .map(|x| FileIOC::EXE(x.as_str()))
-        .collect();
+        .collect()
 }
 
 /// Parse all flash file types found in the input text.
@@ -208,10 +208,10 @@ pub fn parse_flash(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref FLASH_RE: Box<Regex> = compile_re(FLASH_PATTERN);
     }
-    return FLASH_RE
+    FLASH_RE
         .find_iter(input)
         .map(|x| FileIOC::FLASH(x.as_str()))
-        .collect();
+        .collect()
 }
 
 /// Parse all image file types found in the input text.
@@ -223,10 +223,10 @@ pub fn parse_img(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref IMG_RE: Box<Regex> = compile_re(IMG_PATTERN);
     }
-    return IMG_RE
+    IMG_RE
         .find_iter(input)
         .map(|x| FileIOC::IMG(x.as_str()))
-        .collect();
+        .collect()
 }
 
 /// Parse all mac file types found in the input text.
@@ -238,10 +238,10 @@ pub fn parse_mac(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref MAC_RE: Box<Regex> = compile_re(MAC_PATTERN);
     }
-    return MAC_RE
+    MAC_RE
         .find_iter(input)
         .map(|x| FileIOC::MAC(x.as_str()))
-        .collect();
+        .collect()
 }
 
 /// Parse all web file types found in the input text.
@@ -253,10 +253,10 @@ pub fn parse_web(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref WEB_RE: Box<Regex> = compile_re(WEB_PATTERN);
     }
-    return WEB_RE
+    WEB_RE
         .find_iter(input)
         .map(|x| FileIOC::WEB(x.as_str()))
-        .collect();
+        .collect()
 }
 
 /// Parse all compressed file types found in the input text.
@@ -268,10 +268,10 @@ pub fn parse_zip(input: &str) -> Vec<FileIOC> {
     lazy_static! {
         static ref ZIP_RE: Box<Regex> = compile_re(ZIP_PATTERN);
     }
-    return ZIP_RE
+    ZIP_RE
         .find_iter(input)
         .map(|x| FileIOC::ZIP(x.as_str()))
-        .collect();
+        .collect()
 }
 /// Parse all file types found in the input text.
 /// # Arguments
@@ -297,7 +297,7 @@ pub fn parse_file_iocs(input: &str) -> FileIOCS {
     }
     let matches = FILE_PATTERNS.matches(input);
 
-    return FileIOCS {
+    FileIOCS {
         docs: if matches.matched(0) {
             parse_doc(input)
         } else {
@@ -333,7 +333,7 @@ pub fn parse_file_iocs(input: &str) -> FileIOCS {
         } else {
             vec![]
         },
-    };
+    }
 }
 
 #[cfg(test)]
