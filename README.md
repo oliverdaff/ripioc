@@ -42,6 +42,14 @@ The master branch can be referenced directly in the `Cargo.toml` files.
 ```
 [dependencies.ripioc]
 git = "ssh://git@github.com/oliverdaff/ripioc.git"
+rev = "8cc750f"
+```
+
+Optionally a specific revision can be specified.
+```
+[dependencies.ripioc]
+git = "ssh://git@github.com/oliverdaff/ripioc.git"
+rev = "8cc750f"
 ```
 
 
