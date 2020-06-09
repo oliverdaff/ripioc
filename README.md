@@ -6,13 +6,6 @@ A simple rust library containing regex to match [indicators of compromise](https
 ## Motivation
 Text content often contains indicators of compromise.  Sources include Twitter, web pages and pdf reports.  Often IOC extraction is done in slower languages, using Rust to provide this functionality enables large volumes of text to be processed quickly and with low overhead.
 
-## Build Status
-TODO: Add Circle CI badge
-
-## Code style
-TODO: Add code style badge
-
-
 ## Code Example
 The main entry point to the library is `parse_all_iocs(input: &str) -> IOCS`.  This will return a IOCS object that contains each IOC found in the input text.
 

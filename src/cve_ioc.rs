@@ -3,7 +3,7 @@
 //! This module can be used to extract just CVE patterns
 //! from text.
 //!
-//! #Example
+//! # Example
 //! ```
 //! use ripioc::cve_ioc::parse_cve;
 //!
@@ -23,7 +23,7 @@ pub enum CVEIOC<'a> {
     CVE(&'a str),
 }
 
-pub const CVE_PATTERN: &str = r#"(CVE-(19|20)\d{2}-\d{4,7})"#;
+const CVE_PATTERN: &str = r#"(CVE-(19|20)\d{2}-\d{4,7})"#;
 
 /// Returns all the CVEs found in the text.
 ///
