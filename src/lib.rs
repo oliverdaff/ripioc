@@ -35,6 +35,9 @@ pub mod network_ioc;
 
 mod regex_builder;
 
+#[cfg(feature = "serde_support")]
+use serde::Serialize;
+
 use crate::file_ioc::parse_file_iocs;
 use crate::file_ioc::FileIOCS;
 use crate::hash_ioc::parse_hash_iocs;
@@ -46,6 +49,7 @@ use crate::cve_ioc::parse_cve;
 use crate::cve_ioc::CVEIOC;
 
 #[derive(Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "serde_support", derive(Serialize))]
 pub struct IOCS<'a> {
     /// A collection of IOCs found in the text.
     network_iocs: NetworkIOCS<'a>,
