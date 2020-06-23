@@ -25,6 +25,9 @@
 extern crate lazy_static;
 extern crate regex;
 
+#[cfg(feature = "serde_support")]
+extern crate serde;
+
 pub mod cve_ioc;
 pub mod file_ioc;
 pub mod hash_ioc;

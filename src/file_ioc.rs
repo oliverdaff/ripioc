@@ -69,6 +69,10 @@
 //!     *   rar
 //!     *   tar
 //!     *   gz
+//!
+#[cfg(feature = "serde_support")]
+use serde::Serialize;
+
 use crate::regex_builder::compile_re;
 
 use std::boxed::Box;
@@ -79,6 +83,7 @@ use regex::RegexSetBuilder;
 
 /// Different types of documents used as an IOC
 #[derive(Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "serde_support", derive(Serialize))]
 pub enum FileIOC<'a> {
     /// Document type files.
     /// Specifically
@@ -136,6 +141,7 @@ pub enum FileIOC<'a> {
 }
 
 /// A collection of document IOC, partioned by document type
+#[cfg_attr(feature = "serde_support", derive(Serialize))]
 #[derive(Debug, PartialEq, Eq)]
 pub struct FileIOCS<'a> {
     /// Document iocs, found in the text

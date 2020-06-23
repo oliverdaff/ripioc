@@ -20,6 +20,8 @@
 //!
 //! let all_urls = parse_urls("Traffic was set to http://www.test.com ");
 //! ```
+#[cfg(feature = "serde_support")]
+use serde::Serialize;
 
 use regex::Regex;
 use regex::RegexSet;
@@ -30,6 +32,7 @@ use std::boxed::Box;
 use crate::regex_builder::compile_re;
 
 /// Different types of network types of IOC.
+#[cfg_attr(feature = "serde_support", derive(Serialize))]
 #[derive(Debug, PartialEq, Eq)]
 pub enum NetworkIOC<'a> {
     /// URL type network ioc
@@ -47,6 +50,7 @@ pub enum NetworkIOC<'a> {
 }
 
 /// A collection of network IOC, partioned network ioc type.
+#[cfg_attr(feature = "serde_support", derive(Serialize))]
 #[derive(Debug, PartialEq, Eq)]
 pub struct NetworkIOCS<'a> {
     /// URL IOCs, found in the text.

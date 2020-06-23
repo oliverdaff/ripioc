@@ -10,6 +10,9 @@
 //! let cves = parse_cve("The exploit was assigned CVE-2014-0160");
 //! ```
 //!
+#[cfg(feature = "serde_support")]
+use serde::Serialize;
+
 use crate::regex_builder::compile_re;
 
 use std::boxed::Box;
@@ -18,6 +21,7 @@ use regex::Regex;
 
 /// Types of CVE found in the text, currently only one type is available.
 #[derive(Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "serde_support", derive(Serialize))]
 pub enum CVEIOC<'a> {
     /// A CVE found in the text.
     CVE(&'a str),

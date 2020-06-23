@@ -27,6 +27,9 @@
 //! *   SHA256
 //! *   SHA512
 //! *   SSDEEP
+#[cfg(feature = "serde_support")]
+use serde::Serialize;
+
 use crate::regex_builder::compile_re;
 
 use std::boxed::Box;
@@ -36,6 +39,7 @@ use regex::RegexSet;
 use regex::RegexSetBuilder;
 
 /// The types of hashes searched for in the input text.
+#[cfg_attr(feature = "serde_support", derive(Serialize))]
 #[derive(Debug, PartialEq, Eq)]
 pub enum HashIOC<'a> {
     /// MD5 hash patterns.
@@ -51,6 +55,7 @@ pub enum HashIOC<'a> {
 }
 
 ///A set of hash patterns found in the input text.
+#[cfg_attr(feature = "serde_support", derive(Serialize))]
 #[derive(Debug, PartialEq, Eq)]
 pub struct HashIOCS<'a> {
     md5s: Vec<HashIOC<'a>>,

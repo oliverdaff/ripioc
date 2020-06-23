@@ -52,6 +52,11 @@ git = "ssh://git@github.com/oliverdaff/ripioc.git"
 rev = "8cc750f"
 ```
 
+The structs can be serialized using `serde` by building with `serde_support`.
+
+```
+cargo build --features serde_support
+```
 
 ## API Reference
 The four different IOC groups are found their own modules.
