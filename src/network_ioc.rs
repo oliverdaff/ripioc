@@ -54,17 +54,17 @@ pub enum NetworkIOC<'a> {
 #[derive(Debug, PartialEq, Eq)]
 pub struct NetworkIOCS<'a> {
     /// URL IOCs, found in the text.
-    urls: Vec<NetworkIOC<'a>>,
+    pub urls: Vec<NetworkIOC<'a>>,
     /// Domain IOCs, found in the text.
-    domains: Vec<NetworkIOC<'a>>,
+    pub domains: Vec<NetworkIOC<'a>>,
     /// Email IOCs, found in the text.
-    emails: Vec<NetworkIOC<'a>>,
+    pub emails: Vec<NetworkIOC<'a>>,
     /// IPV4 IOCs, found in the text.
-    ipv4s: Vec<NetworkIOC<'a>>,
+    pub ipv4s: Vec<NetworkIOC<'a>>,
     /// IPv6 IOCs, found in the text.
-    ipv6s: Vec<NetworkIOC<'a>>,
+    pub ipv6s: Vec<NetworkIOC<'a>>,
     /// HexURL IOCs, found in the text.
-    hexurls: Vec<NetworkIOC<'a>>,
+    pub hexurls: Vec<NetworkIOC<'a>>,
 }
 
 const URL_PATTERN: &str =

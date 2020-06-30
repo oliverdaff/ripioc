@@ -48,14 +48,18 @@ use crate::network_ioc::NetworkIOCS;
 use crate::cve_ioc::parse_cve;
 use crate::cve_ioc::CVEIOC;
 
+/// A collection of IOCs found in the text.
 #[derive(Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde_support", derive(Serialize))]
 pub struct IOCS<'a> {
-    /// A collection of IOCs found in the text.
-    network_iocs: NetworkIOCS<'a>,
-    hash_iocs: HashIOCS<'a>,
-    file_iocs: FileIOCS<'a>,
-    cve_iocs: Vec<CVEIOC<'a>>,
+    /// The network IOCs found in the text.
+    pub network_iocs: NetworkIOCS<'a>,
+    /// The HashIOCS found in the text.
+    pub hash_iocs: HashIOCS<'a>,
+    /// The FileIOCS found in the text.
+    pub file_iocs: FileIOCS<'a>,
+    /// The CVEIOCs found in the text.
+    pub cve_iocs: Vec<CVEIOC<'a>>,
 }
 
 /// Matches all IOCs against the input and returns

@@ -58,11 +58,11 @@ pub enum HashIOC<'a> {
 #[cfg_attr(feature = "serde_support", derive(Serialize))]
 #[derive(Debug, PartialEq, Eq)]
 pub struct HashIOCS<'a> {
-    md5s: Vec<HashIOC<'a>>,
-    sha1s: Vec<HashIOC<'a>>,
-    sha256s: Vec<HashIOC<'a>>,
-    sha512s: Vec<HashIOC<'a>>,
-    ssdeeps: Vec<HashIOC<'a>>,
+    pub md5s: Vec<HashIOC<'a>>,
+    pub sha1s: Vec<HashIOC<'a>>,
+    pub sha256s: Vec<HashIOC<'a>>,
+    pub sha512s: Vec<HashIOC<'a>>,
+    pub ssdeeps: Vec<HashIOC<'a>>,
 }
 
 const MD5_PATTERN: &str = r#"\b[A-Fa-f0-9]{32}\b"#;

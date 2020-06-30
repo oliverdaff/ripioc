@@ -145,19 +145,19 @@ pub enum FileIOC<'a> {
 #[derive(Debug, PartialEq, Eq)]
 pub struct FileIOCS<'a> {
     /// Document iocs, found in the text
-    docs: Vec<FileIOC<'a>>,
+    pub docs: Vec<FileIOC<'a>>,
     /// Exe iocs, found in the text
-    exes: Vec<FileIOC<'a>>,
+    pub exes: Vec<FileIOC<'a>>,
     /// flash iocs, found in the text
-    flashs: Vec<FileIOC<'a>>,
+    pub flashs: Vec<FileIOC<'a>>,
     /// img iocs, found in the text
-    imgs: Vec<FileIOC<'a>>,
+    pub imgs: Vec<FileIOC<'a>>,
     /// mac iocs, found in the text
-    macs: Vec<FileIOC<'a>>,
+    pub macs: Vec<FileIOC<'a>>,
     /// web iocs, found in the text
-    webs: Vec<FileIOC<'a>>,
+    pub webs: Vec<FileIOC<'a>>,
     /// zip iocs, found in the text
-    zips: Vec<FileIOC<'a>>,
+    pub zips: Vec<FileIOC<'a>>,
 }
 
 const DOC_PATTERN: &str =
