@@ -10,7 +10,7 @@ Text content often contains indicators of compromise.  Sources include Twitter, 
 The main entry point to the library is `parse_all_iocs(input: &str) -> IOCS`.  This will return a IOCS object that contains each IOC found in the input text.
 
 For example reading from `stdin`
-```
+```rust
 extern crate ripioc;
 
 use ripioc::parse_all_iocs;
@@ -31,7 +31,7 @@ fn main() {
 ## Installation
 While this library is in initial state of development installation is done using cargo.
 
-```
+```bash
 git checkout https://github.com/oliverdaff/ripioc
 cargo test 
 cargo install
@@ -39,14 +39,14 @@ cargo install
 
 The master branch can be referenced directly in the `Cargo.toml` files.
 
-```
+```bash
 [dependencies.ripioc]
 git = "ssh://git@github.com/oliverdaff/ripioc.git"
 rev = "8cc750f"
 ```
 
 Optionally a specific revision can be specified.
-```
+```bash
 [dependencies.ripioc]
 git = "ssh://git@github.com/oliverdaff/ripioc.git"
 rev = "8cc750f"
