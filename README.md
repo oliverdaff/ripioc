@@ -1,4 +1,4 @@
-# RIP IOC [![CircleCI](https://circleci.com/gh/oliverdaff/ripioc.svg?style=svg)](https://circleci.com/gh/oliverdaff/ripioc)
+# RIP IOC [![CircleCI](https://circleci.com/gh/oliverdaff/ripioc.svg?style=shield)](https://circleci.com/gh/oliverdaff/ripioc)
 
 A simple rust library containing regex to match [indicators of compromise](https://taosecurity.blogspot.com/2018/11/the-origin-of-term-indicators-of.html "origin of term indicator") (IOC) found in text data.
 
